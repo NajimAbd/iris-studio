@@ -1183,7 +1183,7 @@ body #ch_container[data-mode="molhem"] .ch-section:not([data-types*="molhem"]) {
 <body>
 
 <!-- 🔐 LOGIN MODAL -->
-<div id="loginOverlay" style="display:none;position:fixed;inset:0;background:#0D1A12;z-index:99999;align-items:center;justify-content:center;font-family:Tajawal,sans-serif">
+<div id="loginOverlay" style="display:flex;position:fixed;inset:0;background:#0D1A12;z-index:99999;align-items:center;justify-content:center;font-family:Tajawal,sans-serif">
   <div style="background:linear-gradient(135deg,#0D1A12,#1a2e1a);border:1px solid #B8965A;border-radius:20px;padding:40px 36px;width:92%;max-width:380px;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,0.8)">
     <div style="font-size:48px;margin-bottom:8px">🔐</div>
     <h2 style="color:#B8965A;font-size:22px;margin:0 0 6px;font-weight:700">Iris Studio</h2>
@@ -1614,7 +1614,7 @@ async function doLogin() {
   btn.textContent = 'Se connecter';
 }
 
-window.addEventListener('load', async function() {
+window.addEventListener('DOMContentLoaded', async function() {
   // 🔐 Jeton SSO entrant (venant de Nexa)
   // N'est honoré que si ce site a déjà été authentifié une fois avec un vrai login.
   var urlParams = new URLSearchParams(window.location.search);
@@ -1643,11 +1643,13 @@ window.addEventListener('load', async function() {
     var checkInterval = setInterval(function() {
       if (isSessionValid()) {
         clearInterval(checkInterval);
+        hideLoginOverlay();
         initIris();
       }
     }, 300);
     return;
   }
+  hideLoginOverlay();
   initIris();
 });
 
