@@ -1594,7 +1594,7 @@ async function doLogin() {
     var resp = await fetch(IRIS_AUTH_WEBHOOK, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ login: login, password: pass })
+      body: JSON.stringify({ login: login, password: pass, site: 'iris' })
     });
     var data = await resp.json();
     if (data.success) {
