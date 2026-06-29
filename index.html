@@ -1822,6 +1822,8 @@ window.addEventListener('DOMContentLoaded', async function() {
   var urlParams = new URLSearchParams(window.location.search);
   var ssoToken = urlParams.get('sso');
   if (ssoToken) {
+    var _loginOv = document.getElementById('loginOverlay');
+    if (_loginOv) _loginOv.style.display = 'none';
     var planBlocked = false;
     var blockedLogin = '';
     var blockedNom = '';
