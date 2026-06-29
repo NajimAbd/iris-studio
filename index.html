@@ -1178,7 +1178,14 @@ body #ch_container[data-mode="free"] .ch-section:not([data-types*="free"]) { dis
 body #ch_container[data-mode="paid"] .ch-section:not([data-types*="paid"]) { display: none !important; }
 body #ch_container[data-mode="highticket"] .ch-section:not([data-types*="highticket"]) { display: none !important; }
 body #ch_container[data-mode="molhem"] .ch-section:not([data-types*="molhem"]) { display: none !important; }
+html.sso-pending #loginOverlay { display: none !important; }
 </style>
+<script>
+  // Si on arrive avec un jeton SSO, masquer le login AVANT tout rendu (anti-flash)
+  if (new URLSearchParams(location.search).get('sso')) {
+    document.documentElement.classList.add('sso-pending');
+  }
+</script>
 </head>
 <body>
 
@@ -1574,6 +1581,7 @@ function logout() {
 }
 
 function showLoginOverlay() {
+  document.documentElement.classList.remove('sso-pending');
   document.getElementById('loginOverlay').style.display = 'flex';
   // Enter key pour soumettre
   document.getElementById('loginPass').addEventListener('keydown', function(e) {
