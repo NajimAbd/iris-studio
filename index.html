@@ -1815,22 +1815,20 @@ window.addEventListener('DOMContentLoaded', async function() {
   if (ssoToken) {
     var planBlocked = false;
     var blockedLogin = '';
-    if (localStorage.getItem('iris_real_login_done') === '1') {
-      try {
-        var resp = await fetch(CRM_VERIFY_SSO, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ token: ssoToken, target: 'iris' })
-        });
-        var data = await resp.json();
-        if (data.blocked) {
-          planBlocked = true;
-          blockedLogin = data.login || '';
-        } else if (data.success) {
-          startSession(data.login);
-        }
-      } catch (e) {}
-    }
+    try {
+      var resp = await fetch(CRM_VERIFY_SSO, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token: ssoToken, target: 'iris' })
+      });
+      var data = await resp.json();
+      if (data.blocked) {
+        planBlocked = true;
+        blockedLogin = data.login || '';
+      } else if (data.success && localStorage.getItem('iris_real_login_done') === '1') {
+        startSession(data.login);
+      }
+    } catch (e) {}
     window.history.replaceState({}, document.title, window.location.pathname);
     if (planBlocked) {
       showIrisBlockedOverlay(blockedLogin);
