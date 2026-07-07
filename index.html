@@ -1561,7 +1561,7 @@ async function goToNexa() {
 }
 var SESSION_KEY = 'iris_session_user';
 var SESSION_EXPIRY = 'iris_session_expiry';
-var SESSION_DURATION = 8 * 60 * 60 * 1000; // 8 heures
+var SESSION_DURATION = 60 * 60 * 1000; // 1 heure d'inactivité (prolongée à chaque action)
 
 function isSessionValid() {
   var user = localStorage.getItem(SESSION_KEY);
@@ -1573,6 +1573,26 @@ function startSession(login) {
   localStorage.setItem(SESSION_KEY, login);
   localStorage.setItem(SESSION_EXPIRY, Date.now() + SESSION_DURATION);
 }
+
+// Remet le compteur d'inactivité à zéro (prolonge la session d'1h)
+function refreshSession() {
+  if (localStorage.getItem(SESSION_KEY)) {
+    localStorage.setItem(SESSION_EXPIRY, Date.now() + SESSION_DURATION);
+  }
+}
+
+// Surveillance d'activité : prolonge la session quand l'utilisateur agit,
+// déconnecte automatiquement après 1h d'inactivité (aligné sur Nexa)
+(function startActivityTracking() {
+  ['click', 'keydown', 'scroll', 'mousemove', 'touchstart'].forEach(function(evt) {
+    document.addEventListener(evt, refreshSession, { passive: true });
+  });
+  setInterval(function() {
+    var u = localStorage.getItem(SESSION_KEY);
+    var exp = parseInt(localStorage.getItem(SESSION_EXPIRY) || '0');
+    if (u && Date.now() >= exp) { logout(); }
+  }, 60 * 1000);
+})();
 
 function logout() {
   localStorage.removeItem(SESSION_KEY);
