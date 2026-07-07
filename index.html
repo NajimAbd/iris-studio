@@ -3410,7 +3410,16 @@ function dashHTML() {
     +   '<div class="qc-a qc-a-premium">افتح Elarion AI &larr;</div>'
     + '</div>';
 
-  return hero + '<div class="stats">'+sc+'</div><div class="sec-t">ابدأ بأداة</div><div class="qg">'+elarionCard+qcs+'</div>';
+  // Card Question directe — test rapide du RAG
+  var ragAskCard = ''
+    + '<div class="qc" onclick="openRagAsk()">'
+    +   '<div class="qc-i" style="background:rgba(232,199,122,0.12);color:var(--gold)"><i class="ti ti-message-question"></i></div>'
+    +   '<div class="qc-t">سؤال مباشر</div>'
+    +   '<div class="qc-d">اسأل قاعدة المعرفة (RAG) واحصل على جواب فوري</div>'
+    +   '<div class="qc-a">اسأل &larr;</div>'
+    + '</div>';
+
+  return hero + '<div class="stats">'+sc+'</div><div class="sec-t">ابدأ بأداة</div><div class="qg">'+elarionCard+ragAskCard+qcs+'</div>';
 }
 
 /* ====================================================================
@@ -5566,6 +5575,58 @@ function irisCall(ak, prompt, maxTokens) {
     }
     if (ragOn) return j.output || j.text || j.response || j.message || (typeof j==='string'?j:'');
     var text=''; for (var x=0;x<j.content.length;x++){if(j.content[x].type==='text'){text=j.content[x].text;break;}} return text;
+  });
+}
+
+/* === Question directe — fenêtre de test du RAG === */
+function openRagAsk() {
+  if (!document.getElementById('ragAskOverlay')) {
+    var html = ''
+    + '<div id="ragAskOverlay" dir="rtl" style="position:fixed;inset:0;background:rgba(10,15,28,0.75);backdrop-filter:blur(4px);z-index:9000;display:flex;align-items:center;justify-content:center;padding:20px">'
+    +   '<div style="width:100%;max-width:560px;background:var(--bg-3);border:1px solid var(--b2);border-radius:18px;padding:22px 24px;box-shadow:0 20px 60px rgba(0,0,0,0.5)">'
+    +     '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">'
+    +       '<div style="font-size:18px;font-weight:800;color:var(--gold)"><i class="ti ti-message-question"></i> سؤال مباشر</div>'
+    +       '<div onclick="closeRagAsk()" style="cursor:pointer;color:var(--t3);font-size:20px;padding:4px"><i class="ti ti-x"></i></div>'
+    +     '</div>'
+    +     '<div style="font-size:12.5px;color:var(--t2);margin-bottom:14px">يبحث في قاعدة المعرفة (RAG) ويجيبك فوراً</div>'
+    +     '<textarea id="ragAskInput" rows="3" placeholder="اكتب سؤالك هنا…" style="width:100%;box-sizing:border-box;background:var(--bg-2);border:1px solid var(--b);border-radius:12px;color:var(--t);padding:12px 14px;font-family:inherit;font-size:14px;resize:vertical;outline:none"></textarea>'
+    +     '<button id="ragAskBtn" onclick="sendRagAsk()" style="margin-top:12px;width:100%;background:linear-gradient(135deg,var(--gold),var(--gold-deep));border:none;border-radius:12px;color:#1A1206;font-weight:800;font-size:14px;padding:12px;cursor:pointer;font-family:inherit">اسأل</button>'
+    +     '<div id="ragAskAnswer" style="display:none;margin-top:16px;background:var(--bg-2);border:1px solid var(--b);border-radius:12px;padding:14px;color:var(--t);font-size:14px;line-height:1.8;max-height:45vh;overflow-y:auto;white-space:pre-wrap"></div>'
+    +   '</div>'
+    + '</div>';
+    document.body.insertAdjacentHTML('beforeend', html);
+    document.getElementById('ragAskOverlay').addEventListener('click', function(e){ if (e.target === this) closeRagAsk(); });
+    document.getElementById('ragAskInput').addEventListener('keydown', function(e){ if (e.key==='Enter' && !e.shiftKey) { e.preventDefault(); sendRagAsk(); } });
+  }
+  document.getElementById('ragAskOverlay').style.display = 'flex';
+  document.getElementById('ragAskInput').focus();
+}
+
+function closeRagAsk() {
+  var ov = document.getElementById('ragAskOverlay');
+  if (ov) ov.style.display = 'none';
+}
+
+function sendRagAsk() {
+  var input = document.getElementById('ragAskInput');
+  var btn = document.getElementById('ragAskBtn');
+  var out = document.getElementById('ragAskAnswer');
+  var q = (input.value || '').trim();
+  if (!q) return;
+  btn.disabled = true; btn.textContent = '… جارٍ البحث';
+  out.style.display = 'block'; out.textContent = '';
+  var sid = localStorage.getItem('irisSession');
+  if (!sid) { sid = 's'+Date.now(); localStorage.setItem('irisSession', sid); }
+  fetch('https://n8n.srv936251.hstgr.cloud/webhook/41dc081b-324d-4b90-9cac-7123eea7cc26/chat', {
+    method: 'POST', headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({ chatInput: q, sessionId: 'ragask-'+sid })
+  }).then(function(r){ return r.json(); }).then(function(j){
+    var text = j.output || j.text || j.response || j.message || (typeof j==='string' ? j : '');
+    out.textContent = text || 'لم أتلقَّ جواباً — تحقق من الـ workflow.';
+  }).catch(function(e){
+    out.textContent = 'خطأ في الاتصال: ' + e.message;
+  }).finally(function(){
+    btn.disabled = false; btn.textContent = 'اسأل';
   });
 }
 
