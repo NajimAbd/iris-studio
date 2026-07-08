@@ -3419,7 +3419,7 @@ function dashHTML() {
     +   '<div class="qc-a">اسأل &larr;</div>'
     + '</div>';
 
-  return hero + '<div class="stats">'+sc+'</div><div class="sec-t">ابدأ بأداة</div><div class="qg">'+elarionCard+ragAskCard+qcs+'</div>';
+  return hero + '<div class="stats">'+sc+ragAskCard+'</div><div class="sec-t">ابدأ بأداة</div><div class="qg">'+elarionCard+qcs+'</div>';
 }
 
 /* ====================================================================
@@ -5590,7 +5590,10 @@ function openRagAsk() {
     +     '</div>'
     +     '<div style="font-size:12.5px;color:var(--t2);margin-bottom:14px">يبحث في قاعدة المعرفة (RAG) ويجيبك فوراً</div>'
     +     '<textarea id="ragAskInput" rows="3" placeholder="اكتب سؤالك هنا…" style="width:100%;box-sizing:border-box;background:var(--bg-2);border:1px solid var(--b);border-radius:12px;color:var(--t);padding:12px 14px;font-family:inherit;font-size:14px;resize:vertical;outline:none"></textarea>'
-    +     '<button id="ragAskBtn" onclick="sendRagAsk()" style="margin-top:12px;width:100%;background:linear-gradient(135deg,var(--gold),var(--gold-deep));border:none;border-radius:12px;color:#1A1206;font-weight:800;font-size:14px;padding:12px;cursor:pointer;font-family:inherit">اسأل</button>'
+    +     '<div style="display:flex;gap:8px;margin-top:12px">'
+    +       '<button id="ragAskBtn" onclick="sendRagAsk()" style="flex:1;background:linear-gradient(135deg,var(--gold),var(--gold-deep));border:none;border-radius:12px;color:#1A1206;font-weight:800;font-size:14px;padding:12px;cursor:pointer;font-family:inherit">اسأل</button>'
+    +       '<button onclick="clearRagAsk()" style="background:var(--bg-2);border:1px solid var(--b);border-radius:12px;color:var(--t2);font-size:14px;font-weight:600;padding:12px 18px;cursor:pointer;font-family:inherit"><i class="ti ti-eraser"></i> مسح</button>'
+    +     '</div>'
     +     '<div id="ragAskAnswer" style="display:none;margin-top:16px;background:var(--bg-2);border:1px solid var(--b);border-radius:12px;padding:14px;color:var(--t);font-size:14px;line-height:1.8;max-height:45vh;overflow-y:auto;white-space:pre-wrap"></div>'
     +   '</div>'
     + '</div>';
@@ -5598,13 +5601,24 @@ function openRagAsk() {
     document.getElementById('ragAskOverlay').addEventListener('click', function(e){ if (e.target === this) closeRagAsk(); });
     document.getElementById('ragAskInput').addEventListener('keydown', function(e){ if (e.key==='Enter' && !e.shiftKey) { e.preventDefault(); sendRagAsk(); } });
   }
+  // Toujours repartir propre à l'ouverture (corrige le texte qui restait après un ✕)
+  clearRagAsk();
   document.getElementById('ragAskOverlay').style.display = 'flex';
   document.getElementById('ragAskInput').focus();
+}
+
+function clearRagAsk() {
+  var input = document.getElementById('ragAskInput');
+  var out = document.getElementById('ragAskAnswer');
+  if (input) input.value = '';
+  if (out) { out.textContent = ''; out.style.display = 'none'; }
+  if (input) input.focus();
 }
 
 function closeRagAsk() {
   var ov = document.getElementById('ragAskOverlay');
   if (ov) ov.style.display = 'none';
+  clearRagAsk();
 }
 
 function sendRagAsk() {
