@@ -1219,7 +1219,8 @@ html.sso-pending #loginOverlay { display: none !important; }
 
 
 <div class="mo" id="apiModal" style="display:none">
-  <div class="md">
+  <div class="md" style="position:relative">
+    <div onclick="document.getElementById('apiModal').style.display='none'" style="position:absolute;top:10px;left:14px;cursor:pointer;color:#8a8f9e;font-size:22px;line-height:1;padding:4px" title="إغلاق">&times;</div>
     <h3>مفاتيح API</h3>
     <p>أدخل مفاتيحك. تُحفظ محلياً في متصفحك فقط.</p>
     <label style="display:block;text-align:right;font-size:12px;color:#B8965A;font-weight:700;margin:8px 0 4px">🟣 Claude (Anthropic)</label>
@@ -1261,6 +1262,7 @@ html.sso-pending #loginOverlay { display: none !important; }
         <div class="brand-name">Iris</div>
         <div class="brand-sub">Content Studio</div>
       </div>
+      <div id="userGreeting" style="display:flex;align-items:center;gap:8px;background:rgba(184,150,90,0.1);border:1px solid rgba(184,150,90,0.3);border-radius:20px;padding:5px 12px;font-size:12px;color:#B8965A;font-family:Tajawal,sans-serif"></div>
     </div>
   <div class="topbar-right">
     <div class="rag-toggle on" id="ragToggle" title="LED verte = utiliser tes livres (RAG) / LED éteinte = Claude direct"><div class="rag-led"></div>Direct</div>
@@ -1270,7 +1272,6 @@ html.sso-pending #loginOverlay { display: none !important; }
     <div class="api-label" id="gptLabel" title="حالة مفتاح OpenAI — اضغط للفحص" onclick="checkOpenAIStatus()" style="cursor:pointer"><div class="api-dot" id="gptDot" style="background:#666"></div>ChatGPT AI</div>
     <button class="key-btn" id="changeKeyBtn">تغيير المفتاح</button>
     <a onclick="goToNexa()" title="Aller au tableau de bord Nexa" style="display:flex;align-items:center;gap:7px;background:linear-gradient(135deg,#4d8dff 0%,#2563eb 100%);border:none;border-radius:20px;padding:7px 16px;font-size:13px;font-weight:700;letter-spacing:0.3px;color:#ffffff;cursor:pointer;font-family:Tajawal,sans-serif;text-decoration:none;position:relative;top:0;box-shadow:0 4px 0 #1e3a8a, 0 8px 18px rgba(37,99,235,0.45), inset 0 1px 0 rgba(255,255,255,0.4);transition:all .15s ease" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 6px 0 #1e3a8a, 0 10px 22px rgba(37,99,235,0.55), inset 0 1px 0 rgba(255,255,255,0.4)'" onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='0 4px 0 #1e3a8a, 0 8px 18px rgba(37,99,235,0.45), inset 0 1px 0 rgba(255,255,255,0.4)'" onmousedown="this.style.transform='translateY(3px)';this.style.boxShadow='0 1px 0 #1e3a8a, 0 2px 8px rgba(37,99,235,0.3)'" onmouseup="this.style.transform='translateY(-2px)'"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg> → Nexa</a>
-    <div id="userGreeting" style="display:flex;align-items:center;gap:8px;background:rgba(184,150,90,0.1);border:1px solid rgba(184,150,90,0.3);border-radius:20px;padding:5px 12px;font-size:12px;color:#B8965A;font-family:Tajawal,sans-serif"></div>
     <button onclick="logout()" title="Déconnexion" style="display:flex;align-items:center;gap:6px;background:rgba(220,38,38,0.15);border:1px solid rgba(220,38,38,0.4);border-radius:20px;padding:5px 12px;font-size:12px;color:#f87171;cursor:pointer;font-family:Tajawal,sans-serif;transition:all .2s" onmouseover="this.style.background='rgba(220,38,38,0.3)'" onmouseout="this.style.background='rgba(220,38,38,0.15)'"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg> Quitter</button>
   </div>
 </header>
@@ -3336,11 +3337,23 @@ function dashHTML() {
     +   '<div style="flex:1;font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#22c55e;text-align:center">🟢 ChatGPT (OpenAI)</div>'
     + '</div>'
 
-    // Ligne 1 : Tokens (Claude) | Requêtes (OpenAI)
+    // Ligne 1 : Tokens (jour) — Claude | ChatGPT
     + '<div style="display:flex;gap:16px">'
     +   '<div style="flex:1;background:rgba(232,199,122,0.06);border:1px solid rgba(232,199,122,0.18);border-radius:10px;padding:10px 14px;display:flex;justify-content:space-between;align-items:center">'
     +     '<span id="statTokens" style="font-family:\'JetBrains Mono\',monospace;font-size:14px;color:#E8C77A;font-weight:700">' + formatNumber(stats.tokensToday) + '</span>'
     +     '<span style="font-size:12px;color:#F4ECFF;opacity:0.8">Tokens (jour) 🔥</span>'
+    +   '</div>'
+    +   '<div style="flex:1;background:rgba(34,197,94,0.06);border:1px solid rgba(34,197,94,0.18);border-radius:10px;padding:10px 14px;display:flex;justify-content:space-between;align-items:center">'
+    +     '<span id="gptTokens" style="font-family:\'JetBrains Mono\',monospace;font-size:14px;color:#4ade80;font-weight:700">' + formatNumber(gptStats.tokensToday || 0) + '</span>'
+    +     '<span style="font-size:12px;color:#F4ECFF;opacity:0.8">Tokens (jour) 🔥</span>'
+    +   '</div>'
+    + '</div>'
+
+    // Ligne 2 : Requêtes (jour) — Claude | ChatGPT
+    + '<div style="display:flex;gap:16px">'
+    +   '<div style="flex:1;background:rgba(127,224,255,0.06);border:1px solid rgba(127,224,255,0.18);border-radius:10px;padding:10px 14px;display:flex;justify-content:space-between;align-items:center">'
+    +     '<span id="statRequests" style="font-family:\'JetBrains Mono\',monospace;font-size:14px;color:#7FE0FF;font-weight:700">' + stats.requestsToday + '</span>'
+    +     '<span style="font-size:12px;color:#F4ECFF;opacity:0.8">Requêtes (jour) 📨</span>'
     +   '</div>'
     +   '<div style="flex:1;background:rgba(34,197,94,0.06);border:1px solid rgba(34,197,94,0.18);border-radius:10px;padding:10px 14px;display:flex;justify-content:space-between;align-items:center">'
     +     '<span id="gptRequests" style="font-family:\'JetBrains Mono\',monospace;font-size:14px;color:#4ade80;font-weight:700">' + gptStats.requestsToday + '</span>'
@@ -3348,11 +3361,11 @@ function dashHTML() {
     +   '</div>'
     + '</div>'
 
-    // Ligne 2 : Requêtes (Claude) | Coût jour (OpenAI)
+    // Ligne 3 : Coût (jour) — Claude | ChatGPT
     + '<div style="display:flex;gap:16px">'
-    +   '<div style="flex:1;background:rgba(127,224,255,0.06);border:1px solid rgba(127,224,255,0.18);border-radius:10px;padding:10px 14px;display:flex;justify-content:space-between;align-items:center">'
-    +     '<span id="statRequests" style="font-family:\'JetBrains Mono\',monospace;font-size:14px;color:#7FE0FF;font-weight:700">' + stats.requestsToday + '</span>'
-    +     '<span style="font-size:12px;color:#F4ECFF;opacity:0.8">Requêtes (jour) 📨</span>'
+    +   '<div style="flex:1;background:rgba(74,222,128,0.06);border:1px solid rgba(74,222,128,0.18);border-radius:10px;padding:10px 14px;display:flex;justify-content:space-between;align-items:center">'
+    +     '<span id="statCostDay" style="font-family:\'JetBrains Mono\',monospace;font-size:14px;color:#4ade80;font-weight:700">$' + stats.costToday.toFixed(3) + '</span>'
+    +     '<span style="font-size:12px;color:#F4ECFF;opacity:0.8">Coût (jour) 💰</span>'
     +   '</div>'
     +   '<div style="flex:1;background:rgba(34,197,94,0.06);border:1px solid rgba(34,197,94,0.18);border-radius:10px;padding:10px 14px;display:flex;justify-content:space-between;align-items:center">'
     +     '<span id="gptCostDay" style="font-family:\'JetBrains Mono\',monospace;font-size:14px;color:#4ade80;font-weight:700">$' + gptStats.costToday.toFixed(4) + '</span>'
@@ -3360,11 +3373,11 @@ function dashHTML() {
     +   '</div>'
     + '</div>'
 
-    // Ligne 3 : Coût jour (Claude) | Coût mois (OpenAI)
+    // Ligne 4 : Coût (mois) — Claude | ChatGPT
     + '<div style="display:flex;gap:16px">'
-    +   '<div style="flex:1;background:rgba(74,222,128,0.06);border:1px solid rgba(74,222,128,0.18);border-radius:10px;padding:10px 14px;display:flex;justify-content:space-between;align-items:center">'
-    +     '<span id="statCostDay" style="font-family:\'JetBrains Mono\',monospace;font-size:14px;color:#4ade80;font-weight:700">$' + stats.costToday.toFixed(3) + '</span>'
-    +     '<span style="font-size:12px;color:#F4ECFF;opacity:0.8">Coût estimé (jour) 💰</span>'
+    +   '<div style="flex:1;background:rgba(110,91,255,0.06);border:1px solid rgba(110,91,255,0.18);border-radius:10px;padding:10px 14px;display:flex;justify-content:space-between;align-items:center">'
+    +     '<span id="statCostMonth" style="font-family:\'JetBrains Mono\',monospace;font-size:14px;color:#A78BFA;font-weight:700">$' + stats.costMonth.toFixed(2) + '</span>'
+    +     '<span style="font-size:12px;color:#F4ECFF;opacity:0.8">Coût (mois) 📅</span>'
     +   '</div>'
     +   '<div style="flex:1;background:rgba(34,197,94,0.06);border:1px solid rgba(34,197,94,0.18);border-radius:10px;padding:10px 14px;display:flex;justify-content:space-between;align-items:center">'
     +     '<span id="gptCostMonth" style="font-family:\'JetBrains Mono\',monospace;font-size:14px;color:#22c55e;font-weight:700">$' + gptStats.costMonth.toFixed(3) + '</span>'
@@ -3372,19 +3385,10 @@ function dashHTML() {
     +   '</div>'
     + '</div>'
 
-    // Ligne 4 : Coût mois (Claude) | (case vide pour garder l'alignement)
-    + '<div style="display:flex;gap:16px">'
-    +   '<div style="flex:1;background:rgba(110,91,255,0.06);border:1px solid rgba(110,91,255,0.18);border-radius:10px;padding:10px 14px;display:flex;justify-content:space-between;align-items:center">'
-    +     '<span id="statCostMonth" style="font-family:\'JetBrains Mono\',monospace;font-size:14px;color:#A78BFA;font-weight:700">$' + stats.costMonth.toFixed(2) + '</span>'
-    +     '<span style="font-size:12px;color:#F4ECFF;opacity:0.8">Coût estimé (mois) 📅</span>'
-    +   '</div>'
-    +   '<div style="flex:1"></div>'
-    + '</div>'
-
     // Ligne 5 : boutons de solde (Claude sous sa colonne, ChatGPT sous la sienne)
     + '<div style="display:flex;gap:16px;margin-top:4px">'
-    +   '<button onclick="window.open(\'https://console.anthropic.com/settings/billing\',\'_blank\')" style="flex:1;display:flex;align-items:center;justify-content:center;gap:7px;background:linear-gradient(135deg,var(--gold),var(--gold-deep));border:none;border-radius:10px;color:#1A1206;font-weight:800;font-size:12.5px;padding:10px;cursor:pointer;font-family:inherit"><i class="ti ti-external-link"></i> رصيد Claude API</button>'
-    +   '<button onclick="window.open(\'https://platform.openai.com/settings/organization/billing/overview\',\'_blank\')" style="flex:1;display:flex;align-items:center;justify-content:center;gap:7px;background:rgba(16,163,127,0.15);border:1px solid rgba(16,163,127,0.5);border-radius:10px;color:#25c99a;font-weight:800;font-size:12.5px;padding:10px;cursor:pointer;font-family:inherit"><i class="ti ti-external-link"></i> رصيد ChatGPT</button>'
+    +   '<button onclick="openTab(\'https://console.anthropic.com/settings/billing\')" style="flex:1;display:flex;align-items:center;justify-content:center;gap:7px;background:linear-gradient(135deg,var(--gold),var(--gold-deep));border:none;border-radius:10px;color:#1A1206;font-weight:800;font-size:12.5px;padding:10px;cursor:pointer;font-family:inherit"><i class="ti ti-external-link"></i> رصيد Claude API</button>'
+    +   '<button onclick="openTab(\'https://platform.openai.com/settings/organization/billing/overview\')" style="flex:1;display:flex;align-items:center;justify-content:center;gap:7px;background:rgba(16,163,127,0.15);border:1px solid rgba(16,163,127,0.5);border-radius:10px;color:#25c99a;font-weight:800;font-size:12.5px;padding:10px;cursor:pointer;font-family:inherit"><i class="ti ti-external-link"></i> رصيد ChatGPT</button>'
     + '</div>'
 
     + '</div>' // end colonne 3
@@ -5680,6 +5684,12 @@ function sendRagAsk() {
   }).finally(function(){
     btn.disabled = false; btn.textContent = 'اسأل';
   });
+}
+
+function openTab(url) {
+  var a = document.createElement('a');
+  a.href = url; a.target = '_blank'; a.rel = 'noopener noreferrer';
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
 }
 
 function callAPI(ak, prompt, btnLabel, onSuccess, maxTokens) {
