@@ -2056,7 +2056,7 @@ function restoreState(page) {
 
 function render() {
   var el = document.getElementById('mainContent');
-  if (PAGE === 'dashboard') { el.innerHTML = dashHTML(); if (typeof renderIrisBalance === 'function') renderIrisBalance(); return; }
+  if (PAGE === 'dashboard') { el.innerHTML = dashHTML(); return; }
   if (PAGE === 'elarion')   { el.innerHTML = elarionHTML(); initElarion(); return; }
   if (PAGE === 'challenge') { el.innerHTML = challengeHTML(); initChallenge(); return; }
   if (PAGE === 'archive')   { el.innerHTML = archiveHTML(); return; }
@@ -3451,13 +3451,13 @@ function dashHTML() {
     +   '<div style="display:flex;align-items:center;gap:12px">'
     +     '<div style="width:42px;height:42px;border-radius:12px;background:rgba(232,199,122,0.12);display:flex;align-items:center;justify-content:center;color:var(--gold);font-size:20px"><i class="ti ti-wallet"></i></div>'
     +     '<div>'
-    +       '<div style="font-size:12.5px;color:var(--t2);font-weight:700">الرصيد التقديري · Claude API</div>'
-    +       '<div style="font-size:11px;color:var(--t3)">تقديري — عدِّله يدوياً حسب لوحة Anthropic</div>'
+    +       '<div style="font-size:12.5px;color:var(--t2);font-weight:700">مراقبة رصيد الـ API</div>'
+    +       '<div style="font-size:11px;color:var(--t3)">افتح اللوحة الرسمية للتحقق من رصيدك</div>'
     +     '</div>'
     +   '</div>'
-    +   '<div style="display:flex;align-items:center;gap:12px">'
-    +     '<div id="irisBalanceVal" style="font-family:\'Cinzel\',serif;font-size:26px;font-weight:700;color:var(--gold)">— $</div>'
-    +     '<button onclick="editIrisBalance()" style="background:var(--bg-2);border:1px solid var(--b);border-radius:10px;color:var(--t2);padding:8px 12px;cursor:pointer;font-family:inherit;font-size:13px"><i class="ti ti-pencil"></i> تعديل</button>'
+    +   '<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">'
+    +     '<button onclick="window.open(\'https://console.anthropic.com/settings/billing\',\'_blank\')" style="display:flex;align-items:center;gap:7px;background:linear-gradient(135deg,var(--gold),var(--gold-deep));border:none;border-radius:11px;color:#1A1206;font-weight:800;font-size:13px;padding:10px 16px;cursor:pointer;font-family:inherit"><i class="ti ti-external-link"></i> رصيد Claude API</button>'
+    +     '<button onclick="window.open(\'https://platform.openai.com/settings/organization/billing/overview\',\'_blank\')" style="display:flex;align-items:center;gap:7px;background:rgba(16,163,127,0.15);border:1px solid rgba(16,163,127,0.5);border-radius:11px;color:#25c99a;font-weight:800;font-size:13px;padding:10px 16px;cursor:pointer;font-family:inherit"><i class="ti ti-external-link"></i> رصيد ChatGPT</button>'
     +   '</div>'
     + '</div>'
     + '<div class="stats">'+sc+ragAskCard+'</div><div class="sec-t">ابدأ بأداة</div><div class="qg">'+elarionCard+qcs+'</div>';
@@ -5678,7 +5678,6 @@ function sendRagAsk() {
   }).then(function(r){ return r.json(); }).then(function(j){
     var text = j.output || j.text || j.response || j.message || (typeof j==='string' ? j : '');
     out.textContent = text || 'لم أتلقَّ جواباً — تحقق من الـ workflow.';
-    if (typeof spendIrisBalance === 'function') spendIrisBalance(q, text);
   }).catch(function(e){
     out.textContent = 'خطأ في الاتصال: ' + e.message;
   }).finally(function(){
@@ -5686,47 +5685,11 @@ function sendRagAsk() {
   });
 }
 
-/* === Solde estimé Claude API (aide-mémoire local) === */
-function getIrisBalance() {
-  var v = localStorage.getItem('irisBalanceUSD');
-  return v === null ? null : parseFloat(v);
-}
-function renderIrisBalance() {
-  var el = document.getElementById('irisBalanceVal');
-  if (!el) return;
-  var bal = getIrisBalance();
-  el.textContent = (bal === null) ? '— $' : (bal.toFixed(2) + ' $');
-  el.style.color = (bal !== null && bal < 0.5) ? '#ff6b6b' : 'var(--gold)';
-}
-function editIrisBalance() {
-  var cur = getIrisBalance();
-  var v = prompt('أدخل رصيدك الحالي بالدولار (مثال: 1.47):', cur === null ? '' : cur);
-  if (v === null) return;
-  v = parseFloat(('' + v).replace(',', '.'));
-  if (isNaN(v) || v < 0) { alert('قيمة غير صحيحة'); return; }
-  localStorage.setItem('irisBalanceUSD', v.toFixed(4));
-  renderIrisBalance();
-}
-// Décompte estimé après chaque appel (approx. Sonnet : ~3$/M entrée, ~15$/M sortie)
-function spendIrisBalance(inputText, outputText) {
-  var bal = getIrisBalance();
-  if (bal === null) return; // pas de solde défini -> on ne décompte pas
-  var inTok = ('' + (inputText || '')).length / 4;
-  var outTok = ('' + (outputText || '')).length / 4;
-  var cost = inTok * 3 / 1e6 + outTok * 15 / 1e6;
-  bal = Math.max(0, bal - cost);
-  localStorage.setItem('irisBalanceUSD', bal.toFixed(4));
-  renderIrisBalance();
-}
-
 function callAPI(ak, prompt, btnLabel, onSuccess, maxTokens) {
   LOADING = true;
   var btn = document.getElementById('genBtn');
   if (btn) { btn.disabled=true; btn.innerHTML='<div class="ld"><span></span><span></span><span></span></div>'; }
-  irisCall(ak, prompt, maxTokens || 2000).then(function(resp) {
-    spendIrisBalance(prompt, resp);
-    return onSuccess(resp);
-  }).catch(function(e) {
+  irisCall(ak, prompt, maxTokens || 2000).then(onSuccess).catch(function(e) {
     var el = document.getElementById('resultArea');
     if (el) el.innerHTML = '<div class="rb"><div class="rt" style="color:#a32d2d">خطأ: '+e.message+'</div></div>';
   }).then(function() {
