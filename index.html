@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
+<script src="https://cdn.jsdelivr.net/npm/mammoth@1.12.0/mammoth.browser.min.js"></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Iris — Content Studio</title>
@@ -1421,40 +1422,66 @@ document.querySelectorAll('.nav-item').forEach(function(el) {
 var RAG_UPLOAD_WEBHOOK = 'https://n8n.srv936251.hstgr.cloud/webhook/rag-upload';
 
 function uploadToRAG() {
-  if (RAG_UPLOAD_WEBHOOK.indexOf('VOTRE_WEBHOOK_RAG') !== -1) {
-    alert("⚠️ Le webhook d'upload n'est pas encore configuré.\n\nÉTAPE 2 : crée le workflow n8n d'upload, puis remplace RAG_UPLOAD_WEBHOOK dans le code par l'URL réelle.");
-    return;
-  }
   var input = document.createElement('input');
   input.type = 'file';
-  input.accept = '.pdf,.txt,.docx,.md';
+  // Word (.docx), Google Docs (exporté en .docx ou .txt), et texte — FR / AR / EN
+  input.accept = '.docx,.txt,.md';
   input.onchange = function(e) {
     var file = e.target.files[0];
     if (!file) return;
-    if (file.size > 10 * 1024 * 1024) {
-      alert("Le fichier est trop volumineux (max 10MB)");
-      return;
-    }
-    var formData = new FormData();
-    formData.append('file', file);
-    formData.append('filename', file.name);
+    if (file.size > 10 * 1024 * 1024) { alert("Le fichier est trop volumineux (max 10MB)"); return; }
+
+    var lname = file.name.toLowerCase();
+    var baseName = file.name.replace(/\.(docx|txt|md)$/i, '');
     var btn = document.getElementById('ragUploadBtn');
-    if (btn) btn.innerHTML = '⏳ Envoi...';
-    fetch(RAG_UPLOAD_WEBHOOK, { method: 'POST', body: formData })
-      .then(function(response) {
-        if (response.ok) {
-          alert('✅ Document "' + file.name + '" envoyé au RAG avec succès !');
-        } else {
-          alert("❌ Erreur lors de l'envoi (HTTP " + response.status + ")");
-        }
-      })
-      .catch(function(err) {
-        alert("❌ Erreur de connexion à n8n");
-        console.error(err);
-      })
-      .then(function() {
+
+    // Envoie du TEXTE propre au RAG (en .txt → l'arabe est préservé, pas d'erreur PDF)
+    function sendText(text, filename) {
+      if (!text || !text.trim()) {
+        alert("❌ Le document semble vide (aucun texte trouvé).");
         if (btn) btn.innerHTML = '📎 Ajouter au RAG';
-      });
+        return;
+      }
+      var blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+      var formData = new FormData();
+      formData.append('file', blob, filename);
+      formData.append('filename', filename);
+      if (btn) btn.innerHTML = '⏳ Envoi...';
+      fetch(RAG_UPLOAD_WEBHOOK, { method: 'POST', body: formData })
+        .then(function(response) {
+          if (response.ok) alert('✅ Document "' + filename + '" ajouté au RAG avec succès !');
+          else alert("❌ Erreur lors de l'envoi (HTTP " + response.status + ")");
+        })
+        .catch(function(err) { alert("❌ Erreur de connexion à n8n"); console.error(err); })
+        .then(function() {
+          if (btn) btn.innerHTML = '📎 Ajouter au RAG';
+          if (typeof loadDocsList === 'function') loadDocsList();
+        });
+    }
+
+    if (lname.endsWith('.docx')) {
+      if (typeof mammoth === 'undefined') {
+        alert("La librairie de conversion Word n'a pas pu se charger.\nVérifie ta connexion puis recharge la page.");
+        return;
+      }
+      if (btn) btn.innerHTML = '⏳ Préparation du Word...';
+      var reader = new FileReader();
+      reader.onload = function(ev) {
+        mammoth.extractRawText({ arrayBuffer: ev.target.result })
+          .then(function(result) { sendText(result.value, baseName + '.txt'); })
+          .catch(function(err) {
+            alert("❌ Impossible de lire ce Word : " + err.message);
+            if (btn) btn.innerHTML = '📎 Ajouter au RAG';
+          });
+      };
+      reader.readAsArrayBuffer(file);
+    } else {
+      // .txt / .md : déjà du texte
+      if (btn) btn.innerHTML = '⏳ Préparation...';
+      var reader2 = new FileReader();
+      reader2.onload = function(ev) { sendText(ev.target.result, baseName + '.txt'); };
+      reader2.readAsText(file, 'utf-8');
+    }
   };
   input.click();
 }
