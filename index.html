@@ -3276,7 +3276,10 @@ function dashHTML() {
     + '</div>'
 
     // === CONTENT (4 colonnes : Iris | Œil | Stats | Date+Horloge) ===
-    + '<div style="position:relative;z-index:2;padding:28px 36px 26px;display:flex;align-items:center;justify-content:space-between;gap:28px;flex-wrap:wrap">'
+    + '<div style="position:relative;z-index:2;padding:28px 28px 26px;display:flex;align-items:center;justify-content:space-evenly;gap:16px;flex-wrap:wrap">'
+
+    // GROUPE MARQUE (Iris + Œil ensemble, pour un espacement équilibré)
+    + '<div style="display:flex;align-items:center;gap:22px;flex-shrink:0">'
 
     // COLONNE 1 — Iris title + tagline + Claude AI
     + '<div style="flex-shrink:0;min-width:170px">'
@@ -3321,6 +3324,7 @@ function dashHTML() {
     + '<line x1="124" y1="134" x2="134" y2="124" stroke="rgba(232,199,122,0.4)" stroke-width="1" stroke-linecap="round"/>'
     + '</svg>'
     + '</div>' // end colonne 2
+    + '</div>' // end groupe marque
 
     // COLONNE 3 — Stats (deux sous-colonnes parallèles alignées)
     + '<div style="flex:1;min-width:520px;display:flex;flex-direction:column;gap:10px">'
@@ -3375,6 +3379,12 @@ function dashHTML() {
     +     '<span style="font-size:12px;color:#F4ECFF;opacity:0.8">Coût estimé (mois) 📅</span>'
     +   '</div>'
     +   '<div style="flex:1"></div>'
+    + '</div>'
+
+    // Ligne 5 : boutons de solde (Claude sous sa colonne, ChatGPT sous la sienne)
+    + '<div style="display:flex;gap:16px;margin-top:4px">'
+    +   '<button onclick="window.open(\'https://console.anthropic.com/settings/billing\',\'_blank\')" style="flex:1;display:flex;align-items:center;justify-content:center;gap:7px;background:linear-gradient(135deg,var(--gold),var(--gold-deep));border:none;border-radius:10px;color:#1A1206;font-weight:800;font-size:12.5px;padding:10px;cursor:pointer;font-family:inherit"><i class="ti ti-external-link"></i> رصيد Claude API</button>'
+    +   '<button onclick="window.open(\'https://platform.openai.com/settings/organization/billing/overview\',\'_blank\')" style="flex:1;display:flex;align-items:center;justify-content:center;gap:7px;background:rgba(16,163,127,0.15);border:1px solid rgba(16,163,127,0.5);border-radius:10px;color:#25c99a;font-weight:800;font-size:12.5px;padding:10px;cursor:pointer;font-family:inherit"><i class="ti ti-external-link"></i> رصيد ChatGPT</button>'
     + '</div>'
 
     + '</div>' // end colonne 3
@@ -3447,19 +3457,6 @@ function dashHTML() {
     + '</div>';
 
   return hero
-    + '<div style="background:var(--bg-3);border:1px solid var(--b2);border-radius:16px;padding:15px 20px;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap">'
-    +   '<div style="display:flex;align-items:center;gap:12px">'
-    +     '<div style="width:42px;height:42px;border-radius:12px;background:rgba(232,199,122,0.12);display:flex;align-items:center;justify-content:center;color:var(--gold);font-size:20px"><i class="ti ti-wallet"></i></div>'
-    +     '<div>'
-    +       '<div style="font-size:12.5px;color:var(--t2);font-weight:700">مراقبة رصيد الـ API</div>'
-    +       '<div style="font-size:11px;color:var(--t3)">افتح اللوحة الرسمية للتحقق من رصيدك</div>'
-    +     '</div>'
-    +   '</div>'
-    +   '<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">'
-    +     '<button onclick="window.open(\'https://console.anthropic.com/settings/billing\',\'_blank\')" style="display:flex;align-items:center;gap:7px;background:linear-gradient(135deg,var(--gold),var(--gold-deep));border:none;border-radius:11px;color:#1A1206;font-weight:800;font-size:13px;padding:10px 16px;cursor:pointer;font-family:inherit"><i class="ti ti-external-link"></i> رصيد Claude API</button>'
-    +     '<button onclick="window.open(\'https://platform.openai.com/settings/organization/billing/overview\',\'_blank\')" style="display:flex;align-items:center;gap:7px;background:rgba(16,163,127,0.15);border:1px solid rgba(16,163,127,0.5);border-radius:11px;color:#25c99a;font-weight:800;font-size:13px;padding:10px 16px;cursor:pointer;font-family:inherit"><i class="ti ti-external-link"></i> رصيد ChatGPT</button>'
-    +   '</div>'
-    + '</div>'
     + '<div class="stats">'+sc+ragAskCard+'</div><div class="sec-t">ابدأ بأداة</div><div class="qg">'+elarionCard+qcs+'</div>';
 }
 
