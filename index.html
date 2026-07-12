@@ -1873,6 +1873,11 @@ function showIrisBlockedOverlay(loginRef, nomRef) {
 }
 
 window.addEventListener('DOMContentLoaded', async function() {
+  // Charge les vraies statistiques API depuis la base, puis rafraîchit toutes les 60s
+  if (typeof fetchServerStats === 'function') {
+    fetchServerStats();
+    setInterval(fetchServerStats, 60000);
+  }
   // 🔐 Jeton SSO entrant (venant de Nexa)
   // N'est honoré que si ce site a déjà été authentifié une fois avec un vrai login.
   var urlParams = new URLSearchParams(window.location.search);
@@ -3092,26 +3097,46 @@ function monthKey() {
   return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0');
 }
 
-function getApiStats() {
-  var today = todayKey();
-  var month = monthKey();
-  var dayData = JSON.parse(localStorage.getItem('iris_api_day_' + today) || '{"tokens":0,"requests":0}');
-  var monthTokens = 0;
-  // Parcourt tous les jours du mois pour additionner
-  for (var i = 0; i < localStorage.length; i++) {
-    var k = localStorage.key(i);
-    if (k && k.indexOf('iris_api_day_' + month) === 0) {
-      try {
-        var d = JSON.parse(localStorage.getItem(k));
-        monthTokens += (d.tokens || 0);
-      } catch(e) {}
+// Cache des vraies stats serveur (mises à jour par fetchServerStats)
+var SERVER_STATS = {
+  anthropic: { tokens_jour: 0, requetes_jour: 0, cout_jour: 0, cout_mois: 0 },
+  openai:    { tokens_jour: 0, requetes_jour: 0, cout_jour: 0, cout_mois: 0 }
+};
+
+// Récupère les vraies statistiques depuis la base (workflow CRM API Usage Stats)
+async function fetchServerStats() {
+  try {
+    const resp = await fetch('https://n8n.srv936251.hstgr.cloud/webhook/crm-api-usage');
+    const data = await resp.json();
+    if (data && data.anthropic) {
+      SERVER_STATS.anthropic = {
+        tokens_jour: Number(data.anthropic.tokens_jour) || 0,
+        requetes_jour: Number(data.anthropic.requetes_jour) || 0,
+        cout_jour: Number(data.anthropic.cout_jour) || 0,
+        cout_mois: Number(data.anthropic.cout_mois) || 0
+      };
     }
+    if (data && data.openai) {
+      SERVER_STATS.openai = {
+        tokens_jour: Number(data.openai.tokens_jour) || 0,
+        requetes_jour: Number(data.openai.requetes_jour) || 0,
+        cout_jour: Number(data.openai.cout_jour) || 0,
+        cout_mois: Number(data.openai.cout_mois) || 0
+      };
+    }
+    if (typeof refreshStatsDisplay === 'function') refreshStatsDisplay();
+  } catch (e) {
+    // silencieux : on garde les dernières valeurs connues
   }
+}
+
+function getApiStats() {
+  const s = SERVER_STATS.anthropic;
   return {
-    tokensToday: dayData.tokens,
-    requestsToday: dayData.requests,
-    costToday: dayData.tokens * CLAUDE_COST_PER_TOKEN,
-    costMonth: monthTokens * CLAUDE_COST_PER_TOKEN
+    tokensToday: s.tokens_jour,
+    requestsToday: s.requetes_jour,
+    costToday: s.cout_jour,
+    costMonth: s.cout_mois
   };
 }
 
@@ -3143,17 +3168,14 @@ function trackOpenAIUsage(inputTokens, outputTokens, model) {
 }
 
 function getOpenAIStats() {
-  var today = todayKey();
-  var month = today.substring(0, 7);
-  var dayData = JSON.parse(localStorage.getItem('iris_openai_day_' + today) || '{"tokens":0,"requests":0,"cost":0}');
-  var monthCost = 0, monthReq = 0;
-  for (var i = 0; i < localStorage.length; i++) {
-    var k = localStorage.key(i);
-    if (k && k.indexOf('iris_openai_day_' + month) === 0) {
-      try { var d = JSON.parse(localStorage.getItem(k)); monthCost += (d.cost || 0); monthReq += (d.requests || 0); } catch(e) {}
-    }
-  }
-  return { tokensToday: dayData.tokens, requestsToday: dayData.requests, costToday: dayData.cost, costMonth: monthCost, requestsMonth: monthReq };
+  const s = SERVER_STATS.openai;
+  return {
+    tokensToday: s.tokens_jour,
+    requestsToday: s.requetes_jour,
+    costToday: s.cout_jour,
+    costMonth: s.cout_mois,
+    requestsMonth: s.requetes_jour
+  };
 }
 
 function refreshStatsDisplay() {
