@@ -2157,7 +2157,8 @@ var FUNNEL_PHASES = [
   { id:'sales',    icon:'ti-shopping-cart', label:'بيع',       desc:'5 إيميلات · عرض + CTA', color:'#0ea5e9' },
   { id:'reactivate',icon:'ti-refresh',      label:'تنشيط',     desc:'3 إيميلات · إيقاظ الخامل', color:'#f59e0b' },
   { id:'loyalty',  icon:'ti-heart-handshake',label:'وفاء',     desc:'4 إيميلات · ما بعد الشراء', color:'#ec4899' },
-  { id:'webinar',  icon:'ti-presentation',  label:'تنل ويبينار', desc:'8+ إيميلات · قمع كامل', color:'#E8C77A' }
+  { id:'webinar',  icon:'ti-presentation',  label:'تنل ويبينار', desc:'8+ إيميلات · قمع كامل', color:'#E8C77A' },
+  { id:'show',     icon:'ti-broadcast',     label:'شو RoqyaSuisse', desc:'تسمية مخصصة · Grp_vip/midi/10h/5h', color:'#22c55e' }
 ];
 var FUNNEL_SELECTED = 'welcome';
 
@@ -2256,6 +2257,27 @@ var FUNNEL_BRIEFS = {
       + 'PRÉ-WEBINAIRE: E1 (J-7) Bienvenue+confiance+teasing (AIDA). E2 (J-3) Contenu chaud+anticipation (PAS). E3 (J-1) Rappel+urgence douce (AIDA). E4 (J-0, 1h avant) Dernier rappel+lien+logistique (Direct).\n'
       + 'POST-WEBINAIRE: E5 (J+0) Replay+offre immédiate+bonus limité. E6 (J+1) Relance+preuve sociale+questions. E7 (J+3) Urgence+rareté vraie+bonus qui disparaît. E8 (J+5) Dernière chance+changement de ton+offre finale.\n'
       + 'IMPORTANT: rareté authentique uniquement. Indiquer clairement le timing (J-7, J+0...) au début de chaque email.'
+  },
+  show: {
+    title: 'Tunnel Show RoqyaSuisse (nomenclature officielle)',
+    count: 12,
+    spec: 'TUNNEL SHOW de plusieurs jours (challenge live 3 à 5 jours). '
+      + 'Tu DOIS utiliser EXACTEMENT les identifiants suivants comme titre de chaque email/message — ne pas en inventer d\'autres, ne pas les renommer:\n\n'
+      + '1. Email_Inscription (Email, à l\'inscription) — bienvenue + cadeau PDF offert à TOUS les inscrits.\n'
+      + '2. Av_2Jour1 (Email, J-2 avant le show) — annonce + valeur.\n'
+      + '3. Av_Jour1 (Email, J-1 avant le show) — histoire personnelle / connexion émotionnelle.\n'
+      + '4. Msg_1H (WhatsApp, 1h avant le début) — rappel court avec lien.\n'
+      + '5. Shw-Jour1, Shw-Jour2 … Shw-JourN (Email, après la fin de chaque jour du show) — DEUX variantes obligatoires par jour: (a) pour ceux présents ≥50% du direct: résumé + teaser du lendemain; (b) pour absents ou <50%: lien replay + encouragement doux.\n'
+      + '6. Msg-Joker1 (WhatsApp, 5 min après le début du show), Msg-Joker2 (10 min après), Msg-Joker3 (30 min après) — envoyés UNIQUEMENT aux inscrits qui ne sont pas entrés dans la salle, jamais aux présents. Ton: relance courte et directe.\n'
+      + '7. F-T (Email, juste après le dernier jour du show) — clôture technique + transition vers l\'offre.\n'
+      + '8. P-1, P-2, P-3 (Email, séquence de vente post-show sur 3-5 jours) — P-1 relance douce, P-2 témoignage/preuve sociale, P-3 urgence/clôture réelle de l\'offre.\n'
+      + '9. F-R (Email, dernier email de la séquence) — clôture bienveillante pour les non-acheteurs, annonce qu\'ils resteront informés des prochains rendez-vous.\n\n'
+      + 'GROUPES DE SEGMENTATION (à garder en tête pour adapter le ton, ne pas les citer littéralement dans les emails):\n'
+      + '- Grp_vip: a acheté (achat écrase tout le reste).\n'
+      + '- Grp_midi: a accepté le call et/ou le test Tally, chaud, sans achat — P-1/2/3 peuvent être plus directs/chaleureux pour ce groupe.\n'
+      + '- Grp_10h: engagement modéré (3 à 12 points de présence/replay) — P-1/2/3 plus posés.\n'
+      + '- Grp_5h: engagement très faible (0 à 2 points) — P-1/2/3 plus doux et éducatifs, pas de pression.\n\n'
+      + 'Générer les 12 pièces dans l\'ordre ci-dessus, en respectant scrupuleusement chaque identifiant en tête de bloc (ex: "【 Shw-Jour1 (présent) 】"), avec objet + corps pour les emails, et juste le texte court pour les messages WhatsApp.'
   }
 };
 
