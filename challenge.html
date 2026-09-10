@@ -4,7 +4,7 @@
 <script src="https://cdn.jsdelivr.net/npm/mammoth@1.12.0/mammoth.browser.min.js"></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Iris — Content Studio</title>
+<title>ChallengeGen AI — Pages de challenge</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&family=Amiri:wght@400;700&family=Charm:wght@400;700&family=Cormorant+Garamond:wght@400;500;600;700&family=Cinzel:wght@400;600;700&display=swap" rel="stylesheet">
@@ -1278,45 +1278,13 @@ html.sso-pending #loginOverlay { display: none !important; }
 
 <div class="layout">
   <nav class="sidebar">
-    <div class="nav-sec">الرئيسية</div>
-    <div class="nav-item active" data-page="dashboard" id="nav-dashboard">
-      <div class="ni ni-go"><i class="ti ti-home-2"></i></div>
-      <div><div class="nl">مركز التحكم</div></div>
-    </div>
-    <div class="nav-sec">إنتاج المحتوى</div>
-    <div class="nav-item" data-page="hooks" id="nav-hooks">
-      <div class="ni ni-a"><i class="ti ti-flame"></i></div>
-      <div><div class="nl">مولد شد الانتباه</div><div class="ns">Creator Hook</div></div>
-    </div>
-    <div class="nav-item" data-page="carousel" id="nav-carousel">
-      <div class="ni ni-t"><i class="ti ti-photo"></i></div>
-      <div><div class="nl">مصمم السلايدات</div><div class="ns">Carousel كامل لـ Instagram</div></div>
-    </div>
-    <div class="nav-item" data-page="batch" id="nav-batch">
-      <div class="ni" style="background:linear-gradient(135deg,#8B5CF6,#6D28D9);color:#fff"><i class="ti ti-stack-2"></i></div>
-      <div><div class="nl">مصنع المحتوى</div><div class="ns">Content Factory — 10 منشورات دفعة واحدة</div></div>
-    </div>
-    <div class="nav-sec">جودة وتحليل</div>
-    <div class="nav-item" data-page="quality" id="nav-quality">
-      <div class="ni ni-g"><i class="ti ti-shield-check"></i></div>
-      <div><div class="nl">الخبير المختص</div><div class="ns">محرّك الإنشاء بأسلوب الخبراء</div></div>
-    </div>
-    <div class="nav-sec">التسويق</div>
-    <div class="nav-item" data-page="funnel" id="nav-funnel">
-      <div class="ni" style="background:linear-gradient(135deg,#7c3aed,#c084fc);color:#fff;box-shadow:0 4px 12px rgba(124,58,237,.3)"><i class="ti ti-mail"></i></div>
+    <div class="nav-sec">صفحات الهبوط</div>
+    <div class="nav-item active" data-page="challenge" id="nav-challenge">
+      <div class="ni" style="background:linear-gradient(135deg,#0D7A3E,#B8965A);color:#fff;box-shadow:0 4px 12px rgba(13,122,62,.35),inset 0 1px 0 rgba(255,255,255,0.25)"><i class="ti ti-trophy"></i></div>
       <div>
-        <div class="nl">Iris Funnel</div>
-        <div class="ns">حملات البريد الإلكتروني الكاملة</div>
+        <div class="nl">صفحة التحدي</div>
+        <div class="ns">ChallengeGen AI · 4 لغات</div>
       </div>
-    </div>
-    <div class="nav-sec">مكتبتي</div>
-    <div class="nav-item" data-page="archive" id="nav-archive">
-      <div class="ni" style="background:#e3edf7;color:#1e5aa8"><i class="ti ti-archive"></i></div>
-      <div><div class="nl">الأرشيف</div><div class="ns">كل ما أنتجته محفوظ هنا</div></div>
-    </div>
-    <div class="nav-item" data-page="labo" id="nav-labo">
-      <div class="ni" style="background:#f3e8ff;color:#7e22ce"><i class="ti ti-flask"></i></div>
-      <div><div class="nl">المختبر</div><div class="ns">مساحة العمل والتحرير<span id="labo-badge" style="display:none;background:#9d4edd;color:#fff;font-size:9px;padding:2px 6px;border-radius:8px;margin-right:6px;font-weight:700">0</span></div></div>
     </div>
 
     <!-- Footer Iris -->
@@ -1335,15 +1303,15 @@ html.sso-pending #loginOverlay { display: none !important; }
   </nav>
   <div class="main">
     <div class="ph" id="pageHeader">
-      <div class="ph-t">لوحة القيادة</div>
-      <div class="ph-s">Iris — Content Studio</div>
+      <div class="ph-t">صفحة التحدي</div>
+      <div class="ph-s">ChallengeGen AI · 4 لغات</div>
     </div>
     <div class="content" id="mainContent"></div>
   </div>
 </div>
 
 <script>
-var PAGE = 'dashboard';
+var PAGE = 'challenge';
 var LOADING = false;
 var CAR_SIZE = 'portrait';
 var SLIDES = [];
@@ -6569,6 +6537,7 @@ function openArchiveFiltered(type) {
   }, 50);
 }
 
+document.body.classList.add('elarion-light');
 render();
 
 
